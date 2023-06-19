@@ -16,5 +16,5 @@ rand = "0.8.5"
 proptest = "1.0.0"
 
 [[bench]]
-name = "my_benchmark"
+name = "basic"
 harness = false

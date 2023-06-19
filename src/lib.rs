@@ -65,9 +65,8 @@ impl KeyValueStore {
             storage.seek(SeekFrom::Start(offset))?;
             storage.write_all(value.as_bytes())?;
             storage.write_all(b"\n")?; // Write delimiter
-            storage.sync_all()?;
 
-            index.0.insert(key.clone(), (offset, len)); // Change her
+            index.0.insert(key.clone(), (offset, len));
 
             let mut index_storage = index_storage_clone
                 .write()
@@ -76,6 +75,16 @@ impl KeyValueStore {
             index_storage.write_all(&serde_json::to_vec(&*index)?)?;
         }
 
+        Ok(())
+    }
+
+    // force sync
+    pub fn sync(&self) -> Result<()> {
+        let storage = self
+            .storage
+            .lock()
+            .map_err(|_| anyhow!("Failed to acquire write lock on storage"))?;
+        storage.sync_all()?;
         Ok(())
     }
 
