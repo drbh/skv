@@ -68,11 +68,13 @@ impl KeyValueStore {
 
             index.0.insert(key.clone(), (offset, len));
 
+            let serialized_index = bincode::serialize(&index.0)?;
             let mut index_storage = index_storage_clone
                 .write()
                 .map_err(|_| anyhow!("Failed to acquire write lock on index storage"))?;
             index_storage.set_len(0)?;
-            index_storage.write_all(&serde_json::to_vec(&*index)?)?;
+            index_storage.seek(SeekFrom::Start(0))?;
+            index_storage.write_all(&serialized_index)?;
         }
 
         Ok(())
@@ -85,6 +87,11 @@ impl KeyValueStore {
             .lock()
             .map_err(|_| anyhow!("Failed to acquire write lock on storage"))?;
         storage.sync_all()?;
+        let index_storage = self
+            .index_storage
+            .write()
+            .map_err(|_| anyhow!("Failed to acquire write lock on index storage"))?;
+        index_storage.sync_all()?;
         Ok(())
     }
 
@@ -113,7 +120,7 @@ impl KeyValueStore {
         let mut index_storage = OpenOptions::new().read(true).write(true).open(index_path)?;
         let mut index_content = Vec::new();
         index_storage.read_to_end(&mut index_content)?;
-        let index: Index = serde_json::from_slice(&index_content)?;
+        let index: Index = bincode::deserialize(&index_content)?;
         let offset = storage.seek(SeekFrom::End(0))?;
         Ok(Self {
             index: Arc::new(RwLock::new(index)),
