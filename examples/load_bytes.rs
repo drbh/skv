@@ -6,11 +6,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let store_name = "kv_store1.db";
     let index_name = "kv_index1.db";
 
-    let kv_store =
-        KeyValueStore::<String>::new(format!("tmp/{}", store_name), format!("tmp/{}", index_name))?;
+    let kv_store = KeyValueStore::<[u8; 4]>::new(
+        format!("tmp/{}", store_name),
+        format!("tmp/{}", index_name),
+    )?;
 
     // store a new value
-    kv_store.insert("key1".to_string(), "A string value".to_string())?;
+    kv_store.insert("key1".to_string(), [255, 255, 255, 255])?;
 
     // get the value
     println!("Inital {:?}", kv_store.get("key1"));
@@ -18,7 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     drop(kv_store);
 
     // load the store and index files
-    let kv_store = KeyValueStore::<String>::load(
+    let kv_store = KeyValueStore::<[u8; 4]>::load(
         format!("tmp/{}", store_name),
         format!("tmp/{}", index_name),
     )?;

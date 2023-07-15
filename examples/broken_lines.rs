@@ -10,10 +10,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         KeyValueStore::<String>::new(format!("tmp/{}", store_name), format!("tmp/{}", index_name))?;
 
     // store a new value
-    kv_store.insert("key1".to_string(), "A string value".to_string())?;
+    kv_store.insert(
+        "key1".to_string(),
+        r#"
+        {
+            "name": "John Doe",
+            "age": 43,
+            "phones": [
+                "+44 1234567",
+                "+44 2345678"
+            ]
+        }
+        "#
+        .to_string(),
+    )?;
 
     // get the value
-    println!("Inital {:?}", kv_store.get("key1"));
+    println!("Inital\n{}", kv_store.get("key1").unwrap().unwrap());
 
     drop(kv_store);
 
@@ -24,7 +37,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     // get the value
-    println!("ReRead {:?}", kv_store.get("key1"));
+    println!("ReRead\n{}", kv_store.get("key1").unwrap().unwrap());
 
     // remove the store and index files
     std::fs::remove_file(format!("tmp/{}", store_name))?;

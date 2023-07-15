@@ -10,21 +10,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         KeyValueStore::<String>::new(format!("tmp/{}", store_name), format!("tmp/{}", index_name))?;
 
     // store a new value
-    kv_store.insert("key1".to_string(), "A string value".to_string())?;
+    kv_store.insert("key1".to_string(), "one".to_string())?;
+    kv_store.insert("key2".to_string(), "two".to_string())?;
+    kv_store.insert("key3".to_string(), "three".to_string())?;
+    kv_store.insert("key4".to_string(), "four".to_string())?;
 
     // get the value
-    println!("Inital {:?}", kv_store.get("key1"));
+    println!("Inital\t{}", kv_store.get("key2").unwrap().unwrap());
 
     drop(kv_store);
 
     // load the store and index files
-    let kv_store = KeyValueStore::<String>::load(
+    let mut kv_store = KeyValueStore::<String>::load(
         format!("tmp/{}", store_name),
         format!("tmp/{}", index_name),
     )?;
 
     // get the value
-    println!("ReRead {:?}", kv_store.get("key1"));
+    println!("ReRead\t{}", kv_store.get("key2").unwrap().unwrap());
+    
+    kv_store.delete("key1")?;
+    kv_store.delete("key2")?;
+    kv_store.delete("key3")?;
+    
+    println!("IsGone\t{}", kv_store.get("key2").unwrap().is_none());
+
+
+    kv_store.gc()?;
 
     // remove the store and index files
     std::fs::remove_file(format!("tmp/{}", store_name))?;
