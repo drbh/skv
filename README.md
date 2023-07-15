@@ -31,6 +31,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{:?}", kv_store.get("key2"));
 
     Ok(())
+    
+}
+```
+
+#### Generic input
+
+```rust
+use skv::KeyValueStore;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    // Create a new key-value store with a type that can be serialized
+    // as a byte array. In this case, we use a fixed size array.
+    let kv_store = KeyValueStore::<[u8;2]>::new("kv_store.db", "kv_index.db")?;
+
+    // Insert some key-value pairs
+    kv_store.insert("key1".to_string(), [0, 1])?;
+    kv_store.insert("key2".to_string(), [2, 3])?;
+
+    // Retrieve some key-value pairs
+    println!("{:?}", kv_store.get("key1"));
+    println!("{:?}", kv_store.get("key2"));
+
+    Ok(())
+
+}
 ```
 
 ### Benchmarks
@@ -41,10 +67,10 @@ Please run `cargo bench` to run the benchmarks on your machine to get a better i
 
 | Benchmark         | Lower     | Estimate  | Upper     |
 | ----------------- | --------- | --------- | --------- |
-| random reads      | 15.478 µs | 15.579 µs | 15.689 µs |
-| random writes     | 332.72 µs | 336.56 µs | 341.08 µs |
-| sequential reads  | 15.305 µs | 15.405 µs | 15.517 µs |
-| sequential writes | 324.78 µs | 331.69 µs | 339.40 µs |
+| random reads      | 17.544 µs | 17.774 µs | 18.035 µs |
+| random writes     | 710.12 µs | 756.05 µs | 804.26 µs |
+| sequential reads  | 17.864 µs | 18.160 µs | 18.497 µs |
+| sequential writes | 698.29 µs | 746.16 µs | 800.71 µs |
 
 ### Limitations
 

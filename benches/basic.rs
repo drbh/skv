@@ -10,10 +10,12 @@ fn criterion_benchmark(c: &mut Criterion) {
     group.sample_size(50);
     group.measurement_time(std::time::Duration::new(20, 0));
 
+    std::fs::create_dir_all("bench_tmp").unwrap();
+
     let mut rng = rand::thread_rng();
     let n = 10;
-    let path = "/tmp/storage";
-    let index_path = "/tmp/index";
+    let path = "bench_tmp/storage";
+    let index_path = "bench_tmp/index";
 
     let store = KeyValueStore::new(path, index_path).unwrap();
 
@@ -79,6 +81,12 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     group.finish();
+
+    // remove the store and index files
+    std::fs::remove_file(path).unwrap();
+    std::fs::remove_file(index_path).unwrap();
+    std::fs::remove_dir("bench_tmp").unwrap();
+
 }
 
 criterion_group!(benches, criterion_benchmark);
