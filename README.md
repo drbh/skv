@@ -61,7 +61,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Benchmarks
 
-**TLDR;** `skv` is pretty fast. Read take ~15µs and writes take ~330µs 🏎️
+**TLDR;** `skv` is pretty fast. Read take ~18µs and writes take ~750µs 🏎️
 
 Please run `cargo bench` to run the benchmarks on your machine to get a better idea of how `skv` performs. The following benchmarks were run on a 2019 MBP, they may not be representative of your machine.
 
